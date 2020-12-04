@@ -5,7 +5,7 @@
         $r = [PSCustomObject]@{
             byr = $h.byr -match '^\d{4}$' -and [int]$h.byr -ge 1920 -and [int]$h.byr -le 2002
             iyr = $h.iyr -match '^\d{4}$' -and [int]$h.iyr -ge 2010 -and [int]$h.iyr -le 2020
-            eyr = $h.eyr -match '^\d{4}$' -and [int]$h.eyr -ge 2010 -and [int]$h.eyr -le 2030
+            eyr = $h.eyr -match '^\d{4}$' -and [int]$h.eyr -ge 2020 -and [int]$h.eyr -le 2030
             hgt = ($h.hgt -match '^(\d+)cm$' -and [int]$matches[1] -ge 150 -and [int]$matches[1] -le 193) -or
                 ($h.hgt -match '^(\d+)in$' -and [int]$matches[1] -ge 59 -and [int]$matches[1] -le 76)
             hcl = $h.hcl -match '^#[0-9a-f]{6}$'
