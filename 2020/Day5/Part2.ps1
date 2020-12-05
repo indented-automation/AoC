@@ -1,4 +1,4 @@
-$ids = gc $pwd\input.txt | ? { $_ -match '^(?<r>.+?)(?<c>.{3})$' } | %{
+$ids = gc $PSScriptRoot\input.txt | ? { $_ -match '^(?<r>.+?)(?<c>.{3})$' } | %{
     $rows = 0..127
     switch ($matches.r.ToCharArray()) {
         { $true } { $l = ($rows.Count / 2) - 1 }
