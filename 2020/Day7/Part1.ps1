@@ -19,7 +19,7 @@ $topLevel = gc $pwd\input.txt | ?{ $_ -match '^(?<name>.+?) bags contain' } | %{
     $top
 }
 
-$all = $toplevel | %{ $_; $_.Contains }
+$all = $toplevel | %{ $_; $_.Contains } | group-object Name -AsHashTable -AsString
 
 function Get-ContainingBags {
     [CmdletBinding()]
@@ -28,10 +28,10 @@ function Get-ContainingBags {
         $hasVisited = @{}
     )
 
-    $all | ? Name -eq $Name | ?{ $_.WhenContainedBy -and -not $hasVisited.ContainsKey($_.WhenContainedBy.Name) } | %{
+    $all[$Name] | ?{ $_.WhenContainedBy -and -not $hasVisited.ContainsKey($_.WhenContainedBy.Name) } | %{
         $hasVisited[$_.WhenContainedBy.Name] = 1
         $_.WhenContainedBy
-        Get-ContainingBags -Name $_.WhenContainedBy -hasVisited $hasVisited
+        Get-ContainingBags -Name $_.WhenContainedBy.Name -hasVisited $hasVisited
     }
 }
-Get-ContainingBags -Name 'shiny gold' | measure
+Get-ContainingBags -Name 'shiny gold'
