@@ -38,9 +38,13 @@ class Operation {
         $intCode
     ) {
         $this.intCode = $intCode
-        $modes = $instruction.ToString('00000').Substring(0, 3) -split '' -ne '' -as [ArgumentMode[]]
-        [Array]::Reverse($modes)
-        $this.argumentModes = $modes
+
+        if ($this.argumentCount -gt 0) {
+            $modes = $instruction.ToString('00000').Substring(0, 3) -split '' -ne '' -as [ArgumentMode[]]
+            [Array]::Reverse($modes)
+            $this.argumentModes = $modes[0..($this.argumentCount - 1)]
+        }
+
         $this.Instruction = $instruction
         $this.InstructionParameters = $this.intCode.Peek($this.argumentCount)
     }
@@ -50,13 +54,12 @@ class Operation {
     }
 
     [long] GetValue(
-        [bool] $ignorePosition
+        [bool] $isWriteRequest
     ) {
-
         $value = $this.intCode.Read()
         $mode = $this.argumentModes[$this.argument++]
 
-        if ($ignorePosition -and $mode -eq 'Position') {
+        if ($isWriteRequest -and $mode -eq 'Position') {
             $mode = 'Immediate'
         }
 
@@ -68,7 +71,11 @@ class Operation {
                 $value
             }
             'Relative' {
-                $this.intCode.Read($value + $this.intCode.RelativeBase)
+                if ($isWriteRequest) {
+                    $value + $this.intCode.RelativeBase
+                } else {
+                    $this.intCode.Read($value + $this.intCode.RelativeBase)
+                }
             }
         }
 
@@ -110,8 +117,7 @@ class Add : Operation {
     [long] $Right
     [long] $WriteTo
     [long] $Value
-
-    hidden [int] $argumentCount = 3
+    [int] $argumentCount = 3
 
     Add(
         [long]    $instruction,
@@ -330,7 +336,6 @@ class AdjustRelativeBase : Operation {
     }
 
     [void] Exec() {
-
         $this.IntCode.RelativeBase += $this.RelativeBase
     }
 }

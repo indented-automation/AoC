@@ -259,4 +259,30 @@ Describe IntCode {
             $computer.GetOutput() | Should -Be $ExpectedValue
         }
     }
+
+    Context 'External tests' {
+        It 'External: <Program>: Returns <ExpectedValue>' -TestCases @(
+            @{ Program = '109,-1,4,1,99';            ExpectedValue = -1 }
+            @{ Program = '109,-1,104,1,99';          ExpectedValue = 1 }
+            @{ Program = '109,-1,204,1,99';          ExpectedValue = 109 }
+            @{ Program = '109,1,9,2,204,-6,99';      ExpectedValue = 204 }
+            @{ Program = '109,1,109,9,204,-6,99';    ExpectedValue = 204 }
+            @{ Program = '109,1,209,-1,204,-106,99'; ExpectedValue = 204 }
+        ) {
+            $computer = [IntCode]::Init($Program)
+            $computer.Start()
+            $computer.GetOutput() | Should -Be $ExpectedValue
+        }
+
+        It 'External: <Program> with <Value>: Returns <ExpectedValue>' -TestCases @(
+            @{ Program = '109,1,3,3,204,2,99';   Value = 5; ExpectedValue = 5 }
+            @{ Program = '109,1,203,2,204,2,99'; Value = 5; ExpectedValue = 5 }
+        ) {
+            $computer = [IntCode]::Init($Program)
+            $computer.AddInputValue($Value)
+            $computer.Start()
+            $computer.GetOutput() | Should -Be $ExpectedValue
+        }
+    }
+
 }
