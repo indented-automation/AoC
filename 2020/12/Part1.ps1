@@ -94,7 +94,5 @@ function Trace-Path {
     }
 }
 
-$x, $y = Get-Content $pwd\input.txt |
-    Trace-Path -Position 1000, 1000 |
-    Select-Object -Last 2
+$x, $y = Get-Content $pwd\input.txt | Trace-Path
 [Math]::Abs($x - 1000) + [Math]::Abs($y - 1000)
