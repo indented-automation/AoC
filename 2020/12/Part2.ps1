@@ -81,11 +81,10 @@ function Trace-Path {
     }
 }
 
-$x, $y = Get-Content $pwd\input.txt |
-    Trace-Path -Position 1000, 1000 -Waypoint ([PSCustomObject]@{
-        N = 1
-        E = 10
-        S = 0
-        W = 0
-    })
-[Math]::Abs($x - 1000) + [Math]::Abs($y - 1000)
+$x, $y = Get-Content $pwd\input.txt | Trace-Path -Waypoint ([PSCustomObject]@{
+    N = 1
+    E = 10
+    S = 0
+    W = 0
+})
+[Math]::Abs($x) + [Math]::Abs($y)
