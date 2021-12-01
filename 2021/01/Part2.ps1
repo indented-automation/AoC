@@ -1,4 +1,4 @@
-$n = (gc input.txt) -as [int[]]
+$n = [System.IO.File]::ReadAllLines("$pwd\input.txt") -as [int[]]
 for ($i = $j = $k = 0; $i -lt $n.Count - 2; $i++) {
     $a, $b, $c = $n[$i..($i + 2)]
     $s = $a + $b + $c
