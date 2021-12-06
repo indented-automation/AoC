@@ -1,6 +1,3 @@
-
-# Least common multiple when each individual value repeats on each axis for each moon
-
 $moonID = 1
 
 $moons = Get-Content "$PSScriptRoot\input.txt" |
