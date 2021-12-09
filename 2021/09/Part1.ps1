@@ -1,7 +1,6 @@
-$heightMap = (Get-Content "$PSScriptRoot\input.txt") -ne ''
+$heightMap = Get-Content "$PSScriptRoot\input.txt"
 
 $riskLevel = 0
-$count = 0
 for ($y = 0; $y -lt $heightMap.Count; $y++) {
     for ($x = 0; $x -lt $heightMap[$y].Length; $x++) {
         $current = $heightMap[$y][$x]
@@ -12,10 +11,8 @@ for ($y = 0; $y -lt $heightMap.Count; $y++) {
         $right = $x -lt $heightMap[$y].Length - 1 ? $heightMap[$y][$x + 1] : $null
 
         if (-not (@($up, $down, $left, $right -ne $null) -le $current)) {
-            $count++
             $riskLevel += [int]::Parse($current) + 1
         }
     }
 }
-$count
 $riskLevel
