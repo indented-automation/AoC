@@ -5,7 +5,7 @@ function Get-NextNode {
 
         [string]$Path,
 
-        [string]$Revisit
+        [bool]$Revisit
     )
 
     $Path += ",$CurrentNode"
@@ -24,9 +24,9 @@ function Get-NextNode {
             if ($node -cmatch '[a-z]') {
                 if ($Path -cnotmatch $node) {
                     $canVisit = $true
-                } elseif ($Revisit -eq '') {
+                } elseif (-not $Revisit) {
                     $canVisit = $true
-                    $params['Revisit'] = $node
+                    $params['Revisit'] = $true
                 }
             }
             if ($canVisit) {
