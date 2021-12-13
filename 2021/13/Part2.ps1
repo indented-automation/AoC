@@ -24,6 +24,15 @@ Get-Content "$PSScriptRoot\input.txt" | ForEach-Object {
                 Position = $matches[2] -as [int]
             }
         )
+
+        $dimensions.($matches[1]) -= $matches[2]
+    }
+}
+
+$grid = [string[][]]::new($dimensions.y + 1, $dimensions.x + 1)
+for ($y = 0; $y -le $dimensions.y; $y++) {
+    for ($x = 0; $x -le $dimensions.x; $x++) {
+        $grid[$y][$x] = ' '
     }
 }
 
@@ -37,16 +46,12 @@ foreach ($instruction in $foldInstructions) {
         $point.($instruction.Axis) = $instruction.Position - ($point.($instruction.Axis) - $instruction.Position)
         $coordinates['{0},{1}' -f $point.x, $point.y] = $point
     }
-
-    $dimensions.($instruction.Axis) -= $instruction.Position
 }
 
-for ($y = 0; $y -le $dimensions.y; $y++) {
-    $row = for ($x = 0; $x -le $dimensions.x; $x++) {
-        $coordinates.Contains("$x,$y") ? '#' : ' '
-    }
-    $row = -join $row
-    if ($row.Trim()) {
-        $row
-    }
+foreach ($point in $coordinates.Values) {
+    $grid[$point.y][$point.x] = '#'
+}
+
+for ($y = 0; $y -lt $dimensions.y; $y++) {
+    [string]::new($grid[$y])
 }
