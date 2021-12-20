@@ -10,13 +10,6 @@ function Import-Scanners {
         }
         $scanner
 
-        # $scanner.Beacons = $matches[2] -split '\r?\n' -match '.' | ForEach-Object {
-        #     [PSCustomObject]@{
-        #         ID    = $_
-        #         Point = $_ -split ',' -as [int[]]
-        #     }
-        # }
-
         $scanner.Beacons = [List[int[]]]::new()
 
         $matches[2] -split '\r?\n' -match '.' | ForEach-Object {
