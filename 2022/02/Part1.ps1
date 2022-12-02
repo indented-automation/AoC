@@ -6,13 +6,10 @@ enum Move {
 
 $total = 0
 foreach ($move in [System.IO.File]::ReadAllLines("$PSScriptRoot\input.txt")) {
-    [Move]$opponent, [Move]$player = switch ($move -split '\s+') {
-        'a' { 'Rock'; continue }
-        'b' { 'Paper'; continue }
-        'c' { 'Scissors'; continue }
-        'x' { 'Rock'; continue }
-        'y' { 'Paper'; continue }
-        'z' { 'Scissors' }
+    [Move]$opponent, [Move]$player = switch -regex ($move -split '\s+') {
+        '[ax]' { 'Rock'; continue }
+        '[by]' { 'Paper'; continue }
+        '[cz]' { 'Scissors'; continue }
     }
     $outcome = switch ($opponent) {
         { $_ -eq $player } { 3; break }
