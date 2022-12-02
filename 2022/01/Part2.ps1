@@ -1,7 +1,7 @@
 $top = [System.Collections.Generic.SortedSet[int]]::new()
-foreach ($group in (Get-Content input.txt -Raw) -split '\n{2}') {
+foreach ($group in (Get-Content input.txt -Raw) -split '(\r?\n){2}') {
     $total = 0
-    foreach ($value in $group -split '\n' -match '\d') {
+    foreach ($value in $group -split '\r?\n' -match '\d') {
         $total += [int]$value
     }
     if ($top.Count -lt 3) {
