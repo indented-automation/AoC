@@ -12,8 +12,6 @@ foreach ($assignment in $data) {
     }
 
     if (($sections[0] -band $sections[1]) -in $sections) {
-        Write-Host $assignment
-
         $count++
     }
 }
