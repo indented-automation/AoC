@@ -1,31 +1,29 @@
 $data = [System.IO.File]::ReadAllLines("$PSScriptRoot\input.txt")
 
 $i = 0
-$stackState = do {
+$initial = do {
     if ($data[$i]) {
         $data[$i]
     }
 } while ($data[$i++])
 
-[Array]::Reverse($stackState)
-$header, $entries = $stackState
-$stackState = @(
-    $header.Trim() -replace '\s+', ','
-    foreach ($entry in $entries) {
-        $entry = $entry.PadRight($header.Length + 1)
-        $entries = for ($j = 0; $j -lt $entry.Length; $j += 4) {
-            $entry.Substring($j + 1, 1).Trim()
-        }
-        $entries -join ','
-    }
-)
+[Array]::Reverse($initial)
+$header, $entries = $initial
+$header = $header.Trim() -split '\s+'
 
-$stackState = $stackState | ConvertFrom-Csv
-$properties = $stackState[0].PSObject.Properties.Name
-
+# Read each column
 $stack = [Ordered]@{}
-foreach ($property in $properties) {
-    $stack[$property] = [System.Collections.Generic.Stack[string]]($stackState.$property | Where-Object { $_ })
+for ($j = 0; $j -lt $header.Count; $j++) {
+    $values = foreach ($entry in $entries) {
+        $position = $j * 4 + 1
+        if ($entry.Length -gt $position) {
+            $value = $entry.Substring($position, 1).Trim()
+            if ($value) {
+                $value
+            }
+        }
+    }
+    $stack[$header[$j]] = [System.Collections.Generic.Stack[string]]$values
 }
 
 for (;$i -lt $data.Count; $i++) {
@@ -40,7 +38,7 @@ for (;$i -lt $data.Count; $i++) {
     }
 }
 
-$values = foreach ($property in $properties) {
-     $stack[$property].Pop()
+$values = foreach ($name in $header) {
+    $stack[$name].Pop()
 }
 -join $values
