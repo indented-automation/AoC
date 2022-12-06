@@ -41,7 +41,8 @@ foreach ($key in $stack.Keys) {
 $column = 0
 foreach ($key in $stack.Keys) {
     $row = $height - 2
-    foreach ($value in $stack[$key]) {
+    for ($j = $stack[$key].Count - 1; $j -ge 0; $j--) {
+        $value = ([string[]]$stack[$key])[$j]
         [Console]::SetCursorPosition(4 * $column, $row)
         [Console]::Write('[{0}] ' -f $value)
         $row--
@@ -50,6 +51,8 @@ foreach ($key in $stack.Keys) {
 }
 
 [Console]::SetCursorPosition(0, $height + 2)
+
+Start-Sleep -Milliseconds 5
 
 for (;$i -le $data.Count; $i++) {
     if ($data[$i] -match 'move (?<count>\d+) from (?<from>\d+) to (?<to>\d+)') {
@@ -67,14 +70,16 @@ for (;$i -le $data.Count; $i++) {
             $toColumn = ([int]$matches['to'] - 1) * 4
             $row = $stack[$matches['to']].Count
             [Console]::SetCursorPosition($toColumn, $height - $row - 2)
+
             [Console]::Write('[{0}] ' -f $item)
 
             $stack[$matches['to']].Push($item)
 
             [Console]::SetCursorPosition(0, $height + 2)
-        }
 
-        Start-Sleep -Milliseconds 5
+            Start-Sleep -Milliseconds 1
+
+        }
     }
 }
 
