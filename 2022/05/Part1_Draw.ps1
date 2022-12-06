@@ -1,3 +1,7 @@
+param (
+    [int]$speed = 1
+)
+
 $data = [System.IO.File]::ReadAllLines("$PSScriptRoot\input.txt")
 
 $i = 0
@@ -52,7 +56,7 @@ foreach ($key in $stack.Keys) {
 
 [Console]::SetCursorPosition(0, $height + 2)
 
-Start-Sleep -Milliseconds 5
+Start-Sleep -Milliseconds 1
 
 for (;$i -le $data.Count; $i++) {
     if ($data[$i] -match 'move (?<count>\d+) from (?<from>\d+) to (?<to>\d+)') {
@@ -77,7 +81,7 @@ for (;$i -le $data.Count; $i++) {
 
             [Console]::SetCursorPosition(0, $height + 2)
 
-            Start-Sleep -Milliseconds 1
+            Start-Sleep -Milliseconds $speed
 
         }
     }
