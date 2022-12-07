@@ -18,7 +18,7 @@ switch -wildcard ($data) {
     }
     '$ ls*' {
         $thisPath = $Path -join '/'
-        $pathItems[$thisPath] = [PSCustomObject]@{
+        $pathItems[$thisPath] = @{
             Path      = $thisPath
             Parent    = $pathItems[$thisPath -replace '^.+?/']
             TotalSize = 0
