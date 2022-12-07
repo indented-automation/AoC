@@ -2,38 +2,45 @@ $data = [System.IO.File]::ReadAllLines("$PSScriptRoot\input.txt")
 
 $pathItems = [Ordered]@{}
 $Path = [System.Collections.Generic.Stack[string]]::new()
-switch -regex ($data) {
-    '\$ cd [.]{2}' {
+switch -wildcard ($data) {
+    '$ cd ..' {
         $null = $Path.Pop()
         continue
     }
-    '\$ cd (.+)' {
-        if ($matches[1] -eq '/') {
+    '$ cd*' {
+        $null, $null, $name = $_.Split()
+        if ($name -eq '/') {
             $Path.Push('root')
         } else {
-            $Path.Push($matches[1])
+            $Path.Push($name)
         }
         continue
     }
-    '\$ ls' {
+    '$ ls*' {
         $thisPath = $Path -join '/'
-        $pathItems[$thisPath] = [PSCustomObject]@{
+        $pathItems[$thisPath] = @{
             Path      = $thisPath
             Parent    = $pathItems[$thisPath -replace '^.+?/']
             TotalSize = 0
         }
         continue
     }
-    '^(\d+) (.+)' {
-        $size = [long]$matches[1]
+    '[0-9]* *' {
+        [long]$size, $file = $_.Split()
 
         $parent = $pathItems[$thisPath]
         while ($parent) {
             $parent.TotalSize += $size
             $parent = $parent.Parent
         }
-
         continue
     }
 }
-$pathItems.Values | Where-Object TotalSize -le 100000 | Measure-Object TotalSize -Sum
+
+$total = 0
+foreach ($directory in $pathItems.Values) {
+    if ($directory.TotalSize -le 100000) {
+        $total += $directory.TotalSize
+    }
+}
+$total
