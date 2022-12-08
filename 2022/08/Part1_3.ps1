@@ -23,10 +23,6 @@ class Tree {
         $this.Size = [int]::Parse($size)
         $this.IsVisible = $x -in 0, [Tree]::Max -or $y -in 0, [Tree]::Max
     }
-
-    [void] UpdateVisibility() {
-        $this.IsVisible = $this.VisibleN, $this.VisibleS, $this.VisibleE, $this.VisibleW -contains $true
-    }
 }
 
 function Move-Cursor {
@@ -34,6 +30,10 @@ function Move-Cursor {
         $x,
         $y
     )
+
+    if (-not $Script:Show) {
+        return
+    }
 
     [Console]::SetCursorPosition(
         ($x + 2),
@@ -45,6 +45,10 @@ function Update-Tree {
     param (
         [Tree]$Tree
     )
+
+    if (-not $Script:Show) {
+        return
+    }
 
     Move-Cursor -x $Tree.x -y $Tree.y
 
@@ -60,14 +64,12 @@ $grid = [Tree[,]]::new($data.Count, $data.Count)
 
 [Tree]::Max = $max = $data.Count - 1
 
-Clear-Host
-
 $visibleCount = 0
 
 for ($y = 0; $y -le $max; $y++) {
     for ($x = 0; $x -le $max; $x++) {
         $grid[$x,$y] = $tree = [Tree]::new($x, $y, $data[$y][$x])
-        Update-Tree $tree
+        # Update-Tree $tree
         if ($tree.IsVisible) {
             $visibleCount++
         }
@@ -87,7 +89,9 @@ for ($y = 1; $y -le $max - 1; $y++) {
         )
 
         if ($tree.Size -gt $tree.HighestN) {
-            $tree.VisibleN = $true
+            $tree.IsVisible = $tree.VisibleN = $true
+            # Update-Tree -Tree $tree
+            $visibleCount++
         } else {
             $tree.VisibleN = $false
         }
@@ -106,8 +110,13 @@ for ($y = $max - 1; $y -ge 1; $y--) {
             $neighbour.HighestS
         )
 
+        if ($tree.IsVisible) {
+            continue
+        }
         if ($tree.Size -gt $tree.HighestS) {
-            $tree.VisibleS = $true
+            $tree.IsVisible = $tree.VisibleS = $true
+            # Update-Tree -Tree $tree
+            $visibleCount++
         } else {
             $tree.VisibleS = $false
         }
@@ -126,8 +135,13 @@ for ($y = 1; $y -le $max - 1; $y++) {
             $neighbour.HighestE
         )
 
+        if ($tree.IsVisible) {
+            continue
+        }
         if ($tree.Size -gt $tree.HighestE) {
-            $tree.VisibleE = $true
+            $tree.IsVisible = $tree.VisibleE = $true
+            # Update-Tree -Tree $tree
+            $visibleCount++
         } else {
             $tree.VisibleE = $false
         }
@@ -146,19 +160,19 @@ for ($y = 1; $y -le $max - 1; $y++) {
             $neighbour.HighestW
         )
 
+        if ($tree.IsVisible) {
+            continue
+        }
         if ($tree.Size -gt $tree.HighestW) {
-            $tree.VisibleW = $true
+            $tree.IsVisible = $tree.VisibleW = $true
+            # Update-Tree -Tree $tree
+            $visibleCount++
         } else {
             $tree.VisibleW = $false
         }
-
-        $Tree.UpdateVisibility()
-        if ($tree.IsVisible) {
-            $visibleCount++
-        }
-        Update-Tree -Tree $tree
     }
 }
 
-Move-Cursor -y ($max + 5)
-Write-Host "Visible trees: $VisibleCount" -ForegroundColor White
+# Move-Cursor -y ($max + 5)
+# Write-Host "Visible trees: $VisibleCount" -ForegroundColor White
+$VisibleCount
