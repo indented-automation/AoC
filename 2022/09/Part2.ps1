@@ -37,7 +37,7 @@ foreach ($move in $data) {
             $follow = $rope[$section]
         }
 
-        $null = $visited.Add($rope[-1] -join ',')
+        $null = $visited.Add($rope['9'] -join ',')
     }
 }
 
