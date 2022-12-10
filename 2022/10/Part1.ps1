@@ -13,7 +13,6 @@ do {
         $next = 0
     } else {
         $operation = $data.ReadLine()
-        $row++
         if ($operation -match '^addx (-?\d+)$') {
             $next = $matches[1]
         }
