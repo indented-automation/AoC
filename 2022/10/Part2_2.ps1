@@ -11,8 +11,7 @@ $sprite = $pixel = 0
 do {
     $position = $pixel % 40
     if ($position -ge $sprite - 1 -and $position -le $sprite + 1) {
-        # CrLf
-        $lineBreakChars = 2 * (($pixel - $position) / 40)
+        $lineBreakChars = [Environment]::NewLine.Length * (($pixel - $position) / 40)
         $null = $screen.Replace('.', '#', ($pixel + $lineBreakChars), 1)
     }
 
