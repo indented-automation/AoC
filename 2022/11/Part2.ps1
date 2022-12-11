@@ -52,7 +52,7 @@ class Monkey {
     }
 
     # The least common multiple of *all* divisors
-    # The greatest common demoninator for these 1 (small numbers)
+    # The greatest common demoninator for these is 1 (small numbers)
     static [void] SetLeastCommonMultiple() {
         foreach ($value in [Monkey]::Monkeys.Values.Test) {
             [Monkey]::LeastCommonMultiple *= [Monkey]::LeastCommonMultiple * $value
