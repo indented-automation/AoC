@@ -37,15 +37,19 @@ for ($y = 0; $y -lt $schematic.Count; $y++) {
 
 $adj = @{}
 foreach ($extent in $Numbers.Values) {
-    :adj
-    for ($x = $extent.xs - 1; $x -le $extent.xe + 1; $x++) {
-        for ($y = $extent.y - 1; $y -le $extent.y + 1; $y++) {
-            if ($symbols.Contains("$x,$y")) {
-                $sum += $extent.value
-                $extent.adj = "$x,$y"
-                $adj["$x,$y"] += @($extent)
-                break adj
-            }
+    $around = @(
+        for ($x = $extent.xs - 1; $x -le $extent.xe + 1; $x++) {
+            '{0},{1}' -f $x, ($extent.y - 1)
+            '{0},{1}' -f $x, ($extent.y + 1)
+        }
+        '{0},{1}' -f ($extent.xs - 1), $extent.y
+        '{0},{1}' -f ($extent.xe + 1), $extent.y
+    )
+    foreach ($pos in $around) {
+        if ($symbols.Contains($pos)) {
+            $extent.adj = $pos
+            $adj[$pos] += @($extent)
+            break
         }
     }
 }
