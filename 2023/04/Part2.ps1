@@ -1,6 +1,6 @@
 using namespace System.Collections.Generic
 
-[List[object]]$cards = foreach ($card in [System.IO.File]::ReadAllLines("$PSScriptRoot\input.txt")) {
+$cards = foreach ($card in [System.IO.File]::ReadAllLines("$PSScriptRoot\input.txt")) {
     [int]$number, $win, $hand = $card -split ':\s+|\s\|\s+' -replace '^card\s+'
 
     $matching = [HashSet[int]]($hand -split '\s+')
@@ -17,7 +17,7 @@ for ($i = 0; $i -lt $cards.Count -and $i -le $cards[-1].Card; $i++) {
 
     if ($current.MatchCount) {
         for ($j = $i + 1; $j -le $i + $current.MatchCount; $j++) {
-            $cards[$j].Copies += 1 * $current.Copies
+            $cards[$j].Copies += $current.Copies
         }
     }
 
