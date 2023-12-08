@@ -52,9 +52,7 @@ foreach ($node in $nodes) {
         if ($p -ge $sequence.Length) {
             $p = 0
         }
-        $next = $sequence[$p]
-
-        $node = $node.GetNext($next)
+        $node = $node.GetNext($sequence[$p])
 
         $c++
         $p++
