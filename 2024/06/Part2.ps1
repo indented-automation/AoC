@@ -14,18 +14,22 @@ function Get-NextDirection {
 
 function Test-Route {
     param (
+        [int]
+        $x,
+
+        [int]
+        $y,
+
+        [string]
+        $Direction = 'n',
+
         [Hashtable]
         $Obstacle,
 
         [switch]
-        $GetVisited,
-
-        [string[]]
-        $Route
+        $GetVisited
     )
 
-    $adjacent = @{}
-    $direction = 'n'
     $directions = @{
         n = 0, 1
         e = 1, 0
@@ -33,14 +37,17 @@ function Test-Route {
         w = -1, 0
     }
 
+    $visited = @{}
+    $first = '{0},{1},{2}' -f $x, $y, $Direction
+    $visited[$first] = $true
     if ($GetVisited) {
-        '{0},{1}' -f $guard
+        $first
     }
 
     while ($true) {
         $next = @(
-            $guard[0] + $directions[$direction][0]
-            $guard[1] + $directions[$direction][1]
+            $x + $directions[$Direction][0]
+            $y + $directions[$Direction][1]
         )
         if ($next[0] -lt 0 -or $next[0] -gt $maxX -or $next[1] -lt 0 -or $next[1] -gt $maxY) {
             if ($GetVisited) {
@@ -51,8 +58,9 @@ function Test-Route {
         }
 
         $nextPoint = '{0},{1}' -f $next
+        $pointWithDirection = '{0},{1}' -f $nextPoint, $direction
 
-        if ($adjacent.Contains($nextPoint) -and $adjacent[$nextPoint] -contains $direction) {
+        if ($visited.Contains($pointWithDirection)) {
             if ($GetVisited) {
                 return
             } else {
@@ -61,14 +69,16 @@ function Test-Route {
         }
         if ($Obstacle.Contains($nextPoint)) {
             $adjacent[$nextPoint] += @($direction)
-            $direction = Get-NextDirection $direction
+            $Direction = Get-NextDirection $Direction
             continue
         }
 
         if ($GetVisited) {
-            $nextPoint
+            $pointWithDirection
         }
-        $guard = $next
+        $visited[$pointWithDirection] = $true
+
+        $x, $y = $next
     }
 }
 
@@ -99,24 +109,23 @@ for ($y = 0; $y -lt $grid.Count; $y++) {
 $maxX = $grid[0].Length - 1
 $maxY = $grid.Count - 1
 
-# Started recording the route with the thinking I could just resume from a specific point.
-# But loop detection state also needs capturing. I think I'll leave this alone despite how
-# slow and rubbish this is.
-$route = Test-Route -Obstacle $obstacle -GetVisited
+$route = Test-Route -x $guard[0] -y $guard[1] -Obstacle $obstacle -GetVisited
 
 $count = 0
 $hasTested = [HashSet[string]]::new()
-for ($i = 0; $i -lt $route.Count; $i++) {
-    $point = $route[$i]
+for ($i = 1; $i -lt $route.Count; $i++) {
+    $point, $direction = $route[$i] -split ',', -2
 
     if (-not $hasTested.Add($point)) {
         continue
     }
 
-    $clone = $obstacle.Clone()
-    $clone[$point] = $true
-    if (-not (Test-Route -Obstacle $clone)) {
+    $obstacle[$point] = $true
+    # Restart the path from the last position.
+    $x, $y, $direction = $route[$i - 1] -split ','
+    if (-not (Test-Route -Obstacle $obstacle -x $x -y $y -Direction $direction)) {
         $count++
     }
+    $obstacle.Remove($point)
 }
 $count
