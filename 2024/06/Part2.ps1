@@ -68,7 +68,6 @@ function Test-Route {
             }
         }
         if ($Obstacle.Contains($nextPoint)) {
-            $adjacent[$nextPoint] += @($direction)
             $Direction = Get-NextDirection $Direction
             continue
         }
@@ -84,7 +83,6 @@ function Test-Route {
 
 $grid = [System.IO.File]::ReadAllLines("$PSScriptRoot\input.txt")
 
-$visited = @{}
 $obstacle = @{}
 $guard = @()
 
@@ -100,7 +98,6 @@ for ($y = 0; $y -lt $grid.Count; $y++) {
             $obstacle[$point] = $true
         }
         if ($grid[$y][$x] -eq '^') {
-            $visited[$point] = @('n')
             $guard = $x, $y
         }
     }
@@ -126,6 +123,7 @@ for ($i = 1; $i -lt $route.Count; $i++) {
     if (-not (Test-Route -Obstacle $obstacle -x $x -y $y -Direction $direction)) {
         $count++
     }
+    # Reset state
     $obstacle.Remove($point)
 }
 $count

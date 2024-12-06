@@ -3,8 +3,6 @@ param (
 )
 
 function Show-Grid {
-    if (-not $Show) { return }
-
     Clear-Host
     $rows = for ($y = 0; $y -lt $maxY; $y++) {
         $chars = for ($x = 0; $x -lt $maxX; $x++) {
@@ -46,6 +44,7 @@ function Get-NextDirection {
     param (
         $Direction
     )
+
     switch ($Direction) {
         'n' { return 'e' }
         'e' { return 's' }
@@ -70,13 +69,13 @@ for ($y = 0; $y -lt $grid.Count; $y++) {
         }
         if ($grid[$y][$x] -eq '^') {
             $visited['{0},{1}' -f $x, $y] = $true
-            $guard = $x, $y
+            $guard = $current = $x, $y
         }
     }
 }
 
-$maxX = $grid[0].Length
-$maxY = $grid.Count
+$maxX = $grid[0].Length - 1
+$maxY = $grid.Count - 1
 
 $direction = 'n'
 $directions = @{
@@ -86,13 +85,15 @@ $directions = @{
     w = -1, 0
 }
 
-Show-Grid
+if ($Show) {
+    Show-Grid
+}
 while ($true) {
     $next = @(
-        $guard[0] + $directions[$direction][0]
-        $guard[1] + $directions[$direction][1]
+        $current[0] + $directions[$direction][0]
+        $current[1] + $directions[$direction][1]
     )
-    if ($next[0] -lt 0 -or $next[0] -ge $maxX -or $next[1] -lt 0 -or $next[1] -ge $maxY) {
+    if ($next[0] -lt 0 -or $next[0] -gt $maxX -or $next[1] -lt 0 -or $next[1] -gt $maxY) {
         break
     }
 
@@ -104,8 +105,10 @@ while ($true) {
     }
 
     $visited[$nextPoint] = $true
-    $guard = $next
-    Set-Visited -xy $guard
+    $current = $next
+    if ($Show) {
+        Set-Visited -xy $current
+    }
 }
 
 if ($Show) { [Console]::SetCursorPosition(0, $maxY + 1) }
