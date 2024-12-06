@@ -62,19 +62,19 @@ $guard = @()
 # Just to help visualize.
 [Array]::Reverse($grid)
 
+$visited = @{}
+
 for ($y = 0; $y -lt $grid.Count; $y++) {
     for ($x = 0; $x -lt $grid[$y].Length; $x++) {
         if ($grid[$y][$x] -eq '#') {
             $obstacle['{0},{1}' -f $x, $y] = $true
         }
         if ($grid[$y][$x] -eq '^') {
-            $visited = '{0},{1}' -f $x, $y
+            $visited['{0},{1}' -f $x, $y] = $true
             $guard = $x, $y
         }
     }
 }
-
-$visited = @{}
 
 $maxX = $grid[0].Length
 $maxY = $grid.Count
@@ -93,7 +93,7 @@ while ($true) {
         $guard[0] + $directions[$direction][0]
         $guard[1] + $directions[$direction][1]
     )
-    if ($next[0] -lt 0 -or $next[0] -gt $maxX -or $next[1] -lt 0 -or $next[1] -gt $maxY) {
+    if ($next[0] -lt 0 -or $next[0] -ge $maxX -or $next[1] -lt 0 -or $next[1] -ge $maxY) {
         break
     }
 
