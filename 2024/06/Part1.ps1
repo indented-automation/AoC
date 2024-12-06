@@ -56,13 +56,12 @@ function Get-NextDirection {
 
 $grid = [System.IO.File]::ReadAllLines("$PSScriptRoot\input.txt")
 
+$visited = @{}
 $obstacle = @{}
 $guard = @()
 
 # Just to help visualize.
 [Array]::Reverse($grid)
-
-$visited = @{}
 
 for ($y = 0; $y -lt $grid.Count; $y++) {
     for ($x = 0; $x -lt $grid[$y].Length; $x++) {
@@ -111,4 +110,3 @@ while ($true) {
 
 if ($Show) { [Console]::SetCursorPosition(0, $maxY + 1) }
 $visited.Count
-
