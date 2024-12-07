@@ -23,9 +23,6 @@ function Test-Route {
         [string]
         $Direction = 'n',
 
-        [Hashtable]
-        $Obstacle,
-
         [switch]
         $GetVisited
     )
@@ -37,76 +34,75 @@ function Test-Route {
         w = -1, 0
     }
 
-    $visited = @{}
-    $first = '{0},{1},{2}' -f $x, $y, $Direction
-    $visited[$first] = $true
+    $obstacles = @{}
     if ($GetVisited) {
-        $first
+        '{0},{1},{2}' -f $x, $y, $direction
     }
 
     while ($true) {
-        $next = @(
-            $x + $directions[$Direction][0]
-            $y + $directions[$Direction][1]
-        )
-        if ($next[0] -lt 0 -or $next[0] -gt $maxX -or $next[1] -lt 0 -or $next[1] -gt $maxY) {
-            if ($GetVisited) {
-                return
-            } else {
-                return $true
+        $nextX = $x
+        $nextY = $y
+        $next = $null
+
+        do {
+            if ($GetVisited -and $next) {
+                $next
             }
-        }
+            $x = $nextX
+            $y = $nextY
 
-        $nextPoint = '{0},{1}' -f $next
-        $pointWithDirection = '{0},{1}' -f $nextPoint, $direction
+            $nextX += $directions[$Direction][0]
+            $nextY += $directions[$Direction][1]
 
-        if ($visited.Contains($pointWithDirection)) {
+            if ($nextX -lt 0 -or
+                $nextX -gt $maxX -or
+                $nextY -lt 0 -or
+                $nextY -gt $maxY
+            ) {
+                if ($GetVisited) {
+                    return
+                } else {
+                    return $true
+                }
+            }
+
+            $next = '{0},{1},{2}' -f $nextX, $nextY, $direction
+        } until ($grid[$nextY][$nextX] -eq '#')
+
+        if ($obstacles.Contains($next)) {
             if ($GetVisited) {
                 return
             } else {
                 return $false
             }
         }
-        if ($Obstacle.Contains($nextPoint)) {
-            $Direction = Get-NextDirection $Direction
-            continue
-        }
 
-        if ($GetVisited) {
-            $pointWithDirection
-        }
-        $visited[$pointWithDirection] = $true
-
-        $x, $y = $next
+        $obstacles[$next] = $true
+        $Direction = Get-NextDirection $Direction
     }
 }
 
 $grid = [System.IO.File]::ReadAllLines("$PSScriptRoot\input.txt")
-
-$obstacle = @{}
-$guard = @()
-
 # Just to help visualize.
 [Array]::Reverse($grid)
 
-for ($y = 0; $y -lt $grid.Count; $y++) {
-    for ($x = 0; $x -lt $grid[$y].Length; $x++) {
-        $point = '{0},{1}' -f $x, $y
-
-        $obstacle[$x] += @($point)
-        if ($grid[$y][$x] -eq '#') {
-            $obstacle[$point] = $true
-        }
-        if ($grid[$y][$x] -eq '^') {
-            $guard = $x, $y
+$guard = @()
+$grid = for ($y = 0; $y -lt $grid.Count; $y++) {
+    $row = $grid[$y].ToCharArray()
+    if (-not $guard) {
+        for ($x = 0; $x -lt $row.Count; $x++) {
+            if ($row[$x] -eq '^') {
+                $guard = $x, $y
+            }
         }
     }
+    ,$row
 }
 
-$maxX = $grid[0].Length - 1
+$maxX = $grid[0].Count - 1
 $maxY = $grid.Count - 1
 
-$route = Test-Route -x $guard[0] -y $guard[1] -Obstacle $obstacle -GetVisited
+$route = Test-Route -x $guard[0] -y $guard[1] -GetVisited
 
 $count = 0
 $hasTested = [HashSet[string]]::new()
@@ -117,13 +113,17 @@ for ($i = 1; $i -lt $route.Count; $i++) {
         continue
     }
 
-    $obstacle[$point] = $true
-    # Restart the path from the last position.
+    $currentX, $currentY = $point -split ','
+
+    # Add an obstacle in the current position.
+    $grid[$currentY][$currentX] = '#'
+
     $x, $y, $direction = $route[$i - 1] -split ','
-    if (-not (Test-Route -Obstacle $obstacle -x $x -y $y -Direction $direction)) {
+    if (-not (Test-Route -x $x -y $y -Direction $direction)) {
         $count++
     }
-    # Reset state
-    $obstacle.Remove($point)
+
+    # Remove the obstacle.
+    $grid[$currentY][$currentX] = '.'
 }
 $count
