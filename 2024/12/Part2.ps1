@@ -60,11 +60,6 @@ class GardenPlot {
     [List[Point]]
     $Points = [List[Point]]::new()
 
-    hidden [int] $minX
-    hidden [int] $maxX
-    hidden [int] $minY
-    hidden [int] $maxY
-
     hidden [List[Point]] $perimeterPoint = [List[Point]]::new()
     hidden [hashtable] $edgeLookup = @{
         n = @{}
