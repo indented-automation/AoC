@@ -63,6 +63,10 @@ class GridLogger {
     }
 
     static [void] WriteConsoleObject([int] $x, [int] $y, [string] $object) {
+        if (-not [GridLogger]::Enabled) {
+            return
+        }
+
         [GridLogger]::WriteConsoleObject($x, $y, $object, 'White')
     }
 
@@ -77,6 +81,14 @@ class GridLogger {
 
         [Console]::Write(('{0}{1}{2}' -f $consoleColour, $object, $Script:PSStyle.Reset))
         [Console]::SetCursorPosition(0, [GridLogger]::_instance.Max + [GridLogger]::_instance.Lines + 3)
+    }
+
+    static [void] WriteConsoleLog([string] $message, [object[]] $arguments) {
+        if (-not [GridLogger]::Enabled) {
+            return
+        }
+
+        [GridLogger]::WriteConsoleLog($message -f $arguments)
     }
 
     static [void] WriteConsoleLog([string] $message) {
@@ -201,7 +213,7 @@ function Invoke-Dijkstra {
             continue
         }
 
-        [GridLogger]::WriteConsoleLog('{0}: From {1}. Cost: {2}' -f @(
+        [GridLogger]::WriteConsoleLog('{0}: From {1}. Cost: {2}', @(
             $current.Number
             $current
             $current.Cost
@@ -233,7 +245,7 @@ function Invoke-Dijkstra {
                     $neighbour.Step.Number = $current.Number + 1
                 }
 
-                [GridLogger]::WriteConsoleLog('{0}:   Try {1} {2}: {3}' -f @(
+                [GridLogger]::WriteConsoleLog('{0}:   Try {1} {2}: {3}', @(
                     $neighbour.Step.Number
                     $neighbour.Step
                     $neighbour.Direction
@@ -270,8 +282,8 @@ function Get-NextStep {
         [Step]
         $Current,
 
-        [string[]]
-        $Path = @(),
+        [List[string]]
+        $Path = [List[string]]::new(),
 
         [int]
         $Cost = 0,
@@ -281,7 +293,7 @@ function Get-NextStep {
     )
 
     if (-not $Path) {
-        $Path = $Current.Name
+        $Path.Add($Current.Name)
     }
 
     if ($current.Name -eq [Step]::End.Name) {
@@ -352,7 +364,8 @@ foreach ($stepName in $unique) {
 
 [Step]::Steps = $filtered
 
-# The recurse on the massively reduced set of steps.
+# Recurse on the massively reduced set of steps.
+# There's still over a thousand paths, this takes subjectively ages.
 Get-NextStep -Current ([Step]::Start) |
     Sort-Object Cost |
     Group-Object Cost |
