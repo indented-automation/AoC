@@ -1,37 +1,34 @@
-$position = 50
+$values = [System.IO.File]::ReadAllLines("$PSScriptRoot\input.txt")
 
 $password = 0
-foreach ($movement in [System.IO.File]::ReadAllLines("$PSScriptRoot\input.txt")) {
-    $null = $movement -match '^([LR])(\d+)'
+$position = 50
+foreach ($value in $values) {
+    $isZero = $position -eq 0
 
-    $actual = [int]$matches[2]
-    $effective = $actual % 100
-    $rotations = ($actual - $effective) / 100
+    $number = $value -replace 'L', '-' -replace 'R' -as [int]
+    $effective = $number % 100
+    $rotations = [Math]::Abs(($number - $effective) / 100)
+    $position += $effective
 
-    $next = $position
-
-    if ($matches[1] -eq 'L') {
-        $next -= $effective
-    } else {
-        $next += $effective
+    $click = 0
+    if ($position -lt 0) {
+        # We click 0 unless we started at 0
+        if (-not $isZero) { $click++ }
+        $position += 100
+    }
+    if ($position -gt 99) {
+        $click++
+        $position -= 100
     }
 
-    $passedZero = $false
-    if ($next -gt 99) {
-        $passedZero = $position -ne 100
-        $next -= 100
-    } elseif ($next -lt 0) {
-        $passedZero = $position -ne 0
-        $next += 100
+    # As long as we have not already counted this click
+    if ($position -eq 0 -and -not $click) {
+        $click++
     }
 
-    if ($next -eq 0 -or $passedZero) {
-        $password++
-    }
-    if ($rotations) {
-        $password += $rotations
-    }
+    # Always add the number of times the dial spun around
+    $click += $rotations
 
-    $position = $next
+    $password += $click
 }
 $password
