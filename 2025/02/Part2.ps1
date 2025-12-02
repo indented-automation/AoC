@@ -6,8 +6,6 @@ foreach ($range in $data -replace '\r?\n' -split ',') {
 
     for ($value = $first; $value -le $last; $value++) {
         if ($value -match '^(\d+)\1+$') {
-            $value
-
             $sum += $value
         }
     }
