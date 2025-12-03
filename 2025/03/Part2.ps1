@@ -1,5 +1,3 @@
-using namespace System.Collections
-
 $sum = 0l
 foreach ($bank in [System.IO.File]::ReadAllLines("$PSScriptRoot\input.txt")) {
     $batteries = [int[]][string[]][char[]]$bank
