@@ -1,4 +1,3 @@
-using namespace System.Collections.Generic
 using namespace System.IO
 
 [CmdletBinding()]
@@ -13,9 +12,6 @@ class Range {
 
     [long]
     $End
-
-    [Range[]]
-    $OverlapsWith
 
     [bool]
     $IsMerged
@@ -37,7 +33,7 @@ $fresh, $available = $data -split '(\r?\n){2,}'
 $fresh = $fresh.Trim() -split '\r?\n'
 $available = $available.Trim() -split '\r?\n' -ne '' -as [long[]]
 
-[List[Range]]$ranges = foreach ($range in $fresh) {
+[Range[]]$ranges = foreach ($range in $fresh) {
     $start, $end = $range -split '-'
     @{ Start = $start; End = $end }
 }
