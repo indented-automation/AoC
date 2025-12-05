@@ -20,7 +20,6 @@ class Range {
         return $this.End - $this.Start + 1
     }
     
-
     [string] ToString() {
         return '{0}-{1}' -f $this.Start, $this.End
     }
