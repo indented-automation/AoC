@@ -33,5 +33,8 @@ foreach ($name in 'Part1.ps1', 'Part2.ps1') {
 }
 
 foreach ($name in 'input.txt', 'sample.txt') {
-    New-Item -Path ([Path]::Combine($root, $name)) -ErrorAction Ignore
+    $null = New-Item -Path ([Path]::Combine($root, $name)) -ErrorAction Ignore
 }
+
+code $PSScriptRoot
+Push-Location $root
