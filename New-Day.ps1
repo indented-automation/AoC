@@ -17,7 +17,7 @@ foreach ($name in 'Part1.ps1', 'Part2.ps1') {
         'using namespace System.IO'
         ''
         '[CmdletBinding()]'
-        
+
         'param ('
         '    [switch]'
         '    $Sample'
@@ -28,7 +28,7 @@ foreach ($name in 'Part1.ps1', 'Part2.ps1') {
         '    $fileName = ''sample.txt'''
         '}'
         ''
-        '$data = [File]::ReadAllText([Path]::Combine($PSScriptRoot, $fileName))'
+        '$data = [File]::ReadAllLines([Path]::Combine($PSScriptRoot, $fileName))'
     )
 }
 
